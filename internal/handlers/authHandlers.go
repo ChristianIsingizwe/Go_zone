@@ -12,7 +12,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func RegisterHandler(w http.ResponseWriter, r *http.Response){
+func RegisterHandler(w http.ResponseWriter, r *http.Request){
 	var req types.RegisterUserRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
