@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"github.com/ChristianIsingizwe/Go_zone/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -17,7 +18,7 @@ func connectToDatabase() {
 		log.Fatalf("Failed to connect to the database : %v", err)
 	}
 
-	if err := database.AutoMigrate(&User{}, &Session{}, &CartItem{}, &Order{}, &OrderItem{}, &Review{}); err != nil{
+	if err := database.AutoMigrate(&models.User{}, &models.Session{}, &models.CartItem{}, &models.Order{}, &models.OrderItem{}, &models.Review{}); err != nil{
 		log.Fatalf("Failed to auto-migrate:  %v", err)
 	}
 	DB = database
