@@ -5,11 +5,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/ChristianIsingizwe/Go_zone/configs"
 	"github.com/ChristianIsingizwe/Go_zone/internal/handlers"
 	"github.com/ChristianIsingizwe/Go_zone/internal/services"
 )
 
 func main() {
+
+	configs.LoadEnv()
+
 	services.ConnectToDatabase()
 
 	http.HandleFunc("/register", handlers.RegisterHandler)
