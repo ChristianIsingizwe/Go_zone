@@ -44,8 +44,22 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
+	accessToken, err := services.GenerateAccessToken(fmt.Sprint(user.ID))
+	if err != nil {
+		http.Error(w, "Failed to generate access token", http.StatusInternalServerError)
+		return 
+	}
+
+	refreshToken, err := services.GenerateRefreshToken(fmt.Sprint(user.ID))
+	if err != nil {
+		http.Error(w, "Failed to generate refresh token", http.StatusInternalServerError)
+		return 
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User registered successfully"})
+
+
+	json.NewEncoder(w).Encode()
 }
 
 
