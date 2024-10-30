@@ -64,11 +64,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// if !services.CheckPassword(req.Password, user.Password){
-	// 	http.Error(w, "Incorrect password", http.StatusUnauthorized)
-	// 	return 
-	// }
-
 	if err := services.CheckPassword(req.Password, user.Password); err != nil {
 		http.Error(w, "Incorrect password", http.StatusUnauthorized)
 	}
@@ -98,14 +93,6 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "Refresh token required", http.StatusUnauthorized)
 		return 
 	}
-
-	// token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
-	// 	if _,ok := t.Method.(*jwt.SigningMethodHS256); !ok {
-	// 		return nil, http.ErrAbortHandler
-	// 	}
-		
-	// 	return []byte (os.Getenv("REFRESH_TOKEN_SECRET_KEY")), nil
-	// })
 
 	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
 		if t.Method != jwt.SigningMethodHS256{
