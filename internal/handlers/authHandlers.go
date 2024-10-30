@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"go/token"
 	"net/http"
+	"os"
 
 	"github.com/ChristianIsingizwe/Go_zone/internal/models"
 	"github.com/ChristianIsingizwe/Go_zone/internal/services"
@@ -12,7 +12,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func RegisterUserHandler(w http.ResponseWriter, r *http.Response){
+func RegisterHandler(w http.ResponseWriter, r *http.Response){
 	var req types.RegisterUserRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
@@ -64,9 +64,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	if !services.CheckPassword(req.Password, user.Password){
+	// if !services.CheckPassword(req.Password, user.Password){
+	// 	http.Error(w, "Incorrect password", http.StatusUnauthorized)
+	// 	return 
+	// }
+
+	if err := services.CheckPassword(req.Password, user.Password); err != nil {
 		http.Error(w, "Incorrect password", http.StatusUnauthorized)
-		return 
 	}
 
 	accessToken, err := services.GenerateAccessToken(fmt.Sprint(user.ID))
@@ -95,10 +99,42 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
+	// token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
+	// 	if _,ok := t.Method.(*jwt.SigningMethodHS256); !ok {
+	// 		return nil, http.ErrAbortHandler
+	// 	}
+		
+	// 	return []byte (os.Getenv("REFRESH_TOKEN_SECRET_KEY")), nil
+	// })
+
 	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
-		if _,ok := token.Method.(*jwt.SigningMethodHS256); !ok {
+		if t.Method != jwt.SigningMethodHS256{
 			return nil, http.ErrAbortHandler
 		}
-		
+
+		return []byte(os.Getenv("REFRESH_TOKEN_SECRET_KEY")), nil
 	})
+
+	if err != nil || !token.Valid {
+		http.Error(w, "Invalid refresh token", http.StatusUnauthorized)
+		return 
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		return 
+	}
+
+	userID, ok := claims["userID"].(string)
+	if !ok {
+		http.Error(w, "Invalid token payload", http.StatusUnauthorized)
+	}
+
+	newAccessToken, err := services.GenerateAccessToken(userID)
+	if err != nil {
+		http.Error(w, "Failed to generate a new access token", http.StatusInternalServerError)
+	}
+
+	json.NewEncoder(w).Encode(map[string]string {"Access_token": newAccessToken})
 }
