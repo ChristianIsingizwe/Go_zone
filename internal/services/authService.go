@@ -24,9 +24,10 @@ func CheckPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func GenerateAccessToken(userID string) (string, error) {
+func GenerateAccessToken(userID string, tokenVersion int) (string, error) {
 	claims := jwt.MapClaims{
 		"userId": userID,
+		"tokenVersion": tokenVersion, 
 		"exp":    time.Now().Add(30 * time.Minute).Unix(),
 	}
 
@@ -34,9 +35,10 @@ func GenerateAccessToken(userID string) (string, error) {
 	return token.SignedString([]byte(accessTokenSecretKey))
 }
 
-func GenerateRefreshToken(userID string) (string, error) {
+func GenerateRefreshToken(userID string, tokenVersion int ) (string, error) {
 	claims := jwt.MapClaims{
 		"userId": userID,
+		"tokenVersion": tokenVersion,
 		"exp":    time.Now().Add(7 * 24 * time.Hour).Unix(),
 	}
 

@@ -10,6 +10,7 @@ type User struct {
 	Email     string `gorm:"unique;not null"`
 	Password  string `gorm:"not null"`
 	Role      string `gorm:"not null;default: 'customer'"`
+	tokenversion int `gorm:"not null;default: 1"`
 	CreatedAt time.Time `gorm:"autoCreatedTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	ShoppingCart []CartItem `gorm:"foreignKey:UserID"`
