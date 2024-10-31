@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-
 	"github.com/ChristianIsingizwe/Go_zone/internal/models"
 	"github.com/ChristianIsingizwe/Go_zone/internal/services"
 	"github.com/ChristianIsingizwe/Go_zone/internal/types"
-	"github.com/dgrijalva/jwt-go"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request){
@@ -106,41 +103,41 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 }
 
 
-func RefreshTokenHandler(w http.ResponseWriter, r *http.Request){
-	refreshToken := r.Header.Get("Authorization")
-	if refreshToken == "" {
-		http.Error(w, "Refresh token required", http.StatusUnauthorized)
-		return 
-	}
+// func RefreshTokenHandler(w http.ResponseWriter, r *http.Request){
+// 	refreshToken := r.Header.Get("Authorization")
+// 	if refreshToken == "" {
+// 		http.Error(w, "Refresh token required", http.StatusUnauthorized)
+// 		return 
+// 	}
 
-	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
-		if t.Method != jwt.SigningMethodHS256{
-			return nil, http.ErrAbortHandler
-		}
+// 	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
+// 		if t.Method != jwt.SigningMethodHS256{
+// 			return nil, http.ErrAbortHandler
+// 		}
 
-		return []byte(os.Getenv("REFRESH_TOKEN_SECRET_KEY")), nil
-	})
+// 		return []byte(os.Getenv("REFRESH_TOKEN_SECRET_KEY")), nil
+// 	})
 
-	if err != nil || !token.Valid {
-		http.Error(w, "Invalid refresh token", http.StatusUnauthorized)
-		return 
-	}
+// 	if err != nil || !token.Valid {
+// 		http.Error(w, "Invalid refresh token", http.StatusUnauthorized)
+// 		return 
+// 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
-		return 
-	}
+// 	claims, ok := token.Claims.(jwt.MapClaims)
+// 	if !ok || !token.Valid {
+// 		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+// 		return 
+// 	}
 
-	userID, ok := claims["userID"].(string)
-	if !ok {
-		http.Error(w, "Invalid token payload", http.StatusUnauthorized)
-	}
+// 	userID, ok := claims["userID"].(string)
+// 	if !ok {
+// 		http.Error(w, "Invalid token payload", http.StatusUnauthorized)
+// 	}
 
-	newAccessToken, err := services.GenerateAccessToken(userID)
-	if err != nil {
-		http.Error(w, "Failed to generate a new access token", http.StatusInternalServerError)
-	}
+// 	newAccessToken, err := services.GenerateAccessToken(userID)
+// 	if err != nil {
+// 		http.Error(w, "Failed to generate a new access token", http.StatusInternalServerError)
+// 	}
 
-	json.NewEncoder(w).Encode(map[string]string {"Access_token": newAccessToken})
-}
+// 	json.NewEncoder(w).Encode(map[string]string {"Access_token": newAccessToken})
+// }
